@@ -1,76 +1,57 @@
+import os
 import time
+from typing import Tuple, Optional
 
-# 装饰器定义
-def timeit_decorator(func):
-    def wrapper(*args, **kwargs):
-        start_time = time.time()
-        result = func(*args, **kwargs)
-        end_time = time.time()
-        execution_time = end_time - start_time
-        print(f"函数 {func.__name__} 执行时间: {execution_time:.6f} 秒")
-        return result
-    return wrapper
 
-# 被装饰的函数
-@timeit_decorator
-def add_numbers(a, b):
-    result = a + b
-    print(f"{a} + {b} = {result}")
-    return result
-
-@timeit_decorator
-def file_operations():
+def create_sample_input_file() -> bool:
     try:
-        with open('input.txt', 'r', encoding='utf-8') as file:
-            lines = file.readlines()
-            
-        numbers = []
-        for line in lines:
-            line = line.strip()
-            if line:
-                numbers.extend(line.split())
-        
-        if len(numbers) < 2:
-            print("错误: input.txt 中需要至少两个数字")
-            return None
-            
-        a = float(numbers[0])
-        b = float(numbers[1])
-        result = a + b
-        
-        with open('output.txt', 'w', encoding='utf-8') as file:
-            file.write(f"{a} + {b} = {result}")
-        
-        print(f"结果已写入 output.txt: {a} + {b} = {result}")
-        return result
-    
-    except FileNotFoundError:
-        print("错误: 找不到 input.txt 文件")
-        return None
-    except ValueError:
-        print("错误: 文件格式不正确，请确保包含有效的数字")
-        return None
+        with open("input.txt", 'w', encoding='utf-8') as f:
+            f.write("15.5\n")
+            f.write("23.7\n")
+        print("Создан пример файла input.txt")
+        return True
     except Exception as e:
-        print(f"错误: {e}")
-        return None
+        print(f"Ошибка при создании файла: {e}")
+        return False
 
-def main():
-    print("=" * 50)
-    print("任务5测试 - 装饰器测量函数执行时间")
-    print("=" * 50)
-    
-    print("\n1. 测试 add_numbers 函数:")
-    print("-" * 30)
-    add_numbers(10, 20)
-    add_numbers(123.45, 67.89)
-    
-    print("\n2. 测试 file_operations 函数:")
-    print("-" * 30)
-    file_operations()
-    
-    print("\n" + "=" * 50)
-    print("测试完成!")
-    print("=" * 50)
 
-if __name__ == "__main__":
-    main()
+def validate_input_file(filename: str = "input.txt") -> bool:
+    if not os.path.exists(filename):
+        print(f"Файл '{filename}' не существует")
+        return False
+    
+    if os.path.getsize(filename) == 0:
+        print(f"Файл '{filename}' пуст")
+        return False
+    
+    try:
+        with open(filename, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+            valid_numbers = 0
+            for line in lines:
+                stripped = line.strip()
+                if stripped:
+                    try:
+                        float(stripped)
+                        valid_numbers += 1
+                    except ValueError:
+                        continue
+            
+            if valid_numbers >= 2:
+                print(f"Файл '{filename}' действителен, содержит {valid_numbers} чисел")
+                return True
+            else:
+                print(f"Файл '{filename}' требует минимум 2 действительных числа, но найдено только {valid_numbers}")
+                return False
+    except Exception as e:
+        print(f"Ошибка при проверке файла: {e}")
+        return False
+
+
+def display_file_info():
+    """Отображает информацию о файлах в текущей директории"""
+    print("Информация о файлах в текущей директории:")
+    for file in os.listdir('.'):
+        if file.endswith(('.py', '.txt')):
+            size = os.path.getsize(file)
+            print(f"   {file} ({size} байт)")

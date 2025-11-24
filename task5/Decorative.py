@@ -1,8 +1,3 @@
-"""
-任务5：函数执行时间测量装饰器
-主程序文件 - Decorative.py
-"""
-
 import time
 import functools
 from typing import Any, Callable
@@ -10,35 +5,30 @@ import os
 
 
 def timing_decorator(verbose: bool = True):
-    """
-    测量函数执行时间的装饰器
     
-    参数:
-    verbose: 是否在控制台输出执行时间信息
-    """
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
         def wrapper(*args, **kwargs) -> Any:
-            # 记录开始时间
+            # Записываем время начала
             start_time = time.perf_counter()
             
-            # 执行被装饰的函数
+            # Выполняем декорируемую функцию
             result = func(*args, **kwargs)
             
-            # 记录结束时间
+            # Записываем время окончания
             end_time = time.perf_counter()
             
-            # 计算执行时间（毫秒）
+            # Вычисляем время выполнения (миллисекунды)
             execution_time = (end_time - start_time) * 1000
             
             if verbose:
-                print(f"⏱️  函数 '{func.__name__}' 执行耗时: {execution_time:.4f} 毫秒")
+                print(f"Функция '{func.__name__}' выполнилась за: {execution_time:.4f} мс")
                 if args:
-                    print(f"   参数: {args}")
+                    print(f"   Аргументы: {args}")
                 if kwargs:
-                    print(f"   关键字参数: {kwargs}")
+                    print(f"   Именованные аргументы: {kwargs}")
                 if result is not None:
-                    print(f"   返回值: {result}")
+                    print(f"   Возвращаемое значение: {result}")
                 print("-" * 50)
             
             return result
@@ -47,241 +37,205 @@ def timing_decorator(verbose: bool = True):
 
 
 class PerformanceMonitor:
-    """
-    性能监控器类，提供更高级的计时功能
-    """
     
-    def __init__(self, description: str = "操作"):
+    def __init__(self, description: str = "операция"):
         self.description = description
         self.start_time = None
         self.end_time = None
     
     def __enter__(self):
-        """进入上下文管理器时开始计时"""
         self.start_time = time.perf_counter()
-        print(f"🚀 开始 {self.description}...")
+        print(f"Начало {self.description}...")
         return self
     
     def __exit__(self, exc_type, exc_val, exc_tb):
-        """退出上下文管理器时结束计时"""
+        """Заканчивает отсчет времени при выходе из контекстного менеджера"""
         self.end_time = time.perf_counter()
         execution_time = (self.end_time - self.start_time) * 1000
-        print(f"✅ {self.description}完成，耗时: {execution_time:.4f} 毫秒")
+        print(f"{self.description} завершена, время: {execution_time:.4f} мс")
         print()
 
 
 # ============================================================================
-# 测试函数1：计算两个数字的和并在控制台输出
+# Тестовая функция 1: Вычисление суммы двух чисел с выводом в консоль
 # ============================================================================
 
 @timing_decorator()
 def calculate_sum(a: float, b: float) -> float:
-    """
-    计算两个数字的和并在控制台输出结果
     
-    参数:
-    a: 第一个数字
-    b: 第二个数字
-    
-    返回:
-    float: 两个数字的和
-    """
     result = a + b
-    print(f"📊 计算: {a} + {b} = {result}")
+    print(f"Вычисление: {a} + {b} = {result}")
     return result
 
 
 # ============================================================================
-# 测试函数2：文件读写操作
+# Тестовая функция 2: Операции чтения и записи файлов
 # ============================================================================
 
 @timing_decorator()
 def read_numbers_from_file(filename: str = "input.txt") -> tuple:
-    """
-    从文件读取两个数字
     
-    参数:
-    filename: 输入文件名
+    print(f"Чтение файла: {filename}")
     
-    返回:
-    tuple: 包含两个数字的元组，如果出错返回 (None, None)
-    """
-    print(f"📖 正在读取文件: {filename}")
-    
-    # 检查文件是否存在
+    # Проверяем существование файла
     if not os.path.exists(filename):
-        print(f"❌ 错误: 文件 '{filename}' 不存在")
+        print(f"Ошибка: файл '{filename}' не существует")
         return None, None
     
-    # 检查文件是否为空
+    # Проверяем, не пустой ли файл
     if os.path.getsize(filename) == 0:
-        print(f"❌ 错误: 文件 '{filename}' 为空")
+        print(f"Ошибка: файл '{filename}' пуст")
         return None, None
     
     try:
         with open(filename, 'r', encoding='utf-8') as file:
             lines = file.readlines()
-            print(f"📄 读取到 {len(lines)} 行内容")
+            print(f"Прочитано {len(lines)} строк")
             
-            # 显示文件内容用于调试
+            # Показываем содержимое файла для отладки
             for i, line in enumerate(lines):
-                print(f"   第{i+1}行: '{line.strip()}'")
+                print(f"   Строка {i+1}: '{line.strip()}'")
             
-            # 过滤空行和非数字行
+            # Фильтруем пустые строки и строки не с числами
             numbers = []
             for line in lines:
                 stripped_line = line.strip()
-                if stripped_line:  # 非空行
+                if stripped_line:  # непустая строка
                     try:
                         num = float(stripped_line)
                         numbers.append(num)
-                        print(f"✅ 成功解析数字: {num}")
+                        print(f"Успешно распознано число: {num}")
                     except ValueError:
-                        print(f"⚠️  跳过非数字行: '{stripped_line}'")
+                        print(f"Пропуск строки не с числом: '{stripped_line}'")
             
             if len(numbers) < 2:
-                print(f"❌ 错误: 需要2个数字，但只找到 {len(numbers)} 个有效数字")
+                print(f"Ошибка: требуется 2 числа, но найдено только {len(numbers)} действительных чисел")
                 return None, None
             
             a, b = numbers[0], numbers[1]
-            print(f"✅ 成功读取数字: {a} 和 {b}")
+            print(f"Успешно прочитаны числа: {a} и {b}")
             return a, b
             
     except Exception as e:
-        print(f"❌ 读取文件时出错: {e}")
+        print(f"Ошибка при чтении файла: {e}")
         return None, None
 
 
 @timing_decorator()
 def write_result_to_file(result: float, filename: str = "output.txt"):
-    """
-    将结果写入文件
     
-    参数:
-    result: 要写入的结果
-    filename: 输出文件名
-    """
-    print(f"📝 正在写入结果到文件: {filename}")
+    print(f"Запись результата в файл: {filename}")
     
     try:
         with open(filename, 'w', encoding='utf-8') as file:
-            file.write(f"计算结果: {result}\n")
-            file.write(f"计算时间: {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
-            file.write(f"程序: 任务5 - 装饰器演示\n")
+            file.write(f"Результат вычисления: {result}\n")
+            file.write(f"Время вычисления: {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
+            file.write(f"Программа: Задача 5 - Демонстрация декоратора\n")
         
-        print(f"✅ 结果已成功写入文件 '{filename}'")
+        print(f"Результат успешно записан в файл '{filename}'")
         return True
         
     except Exception as e:
-        print(f"❌ 写入文件时出错: {e}")
+        print(f"Ошибка при записи файла: {e}")
         return False
 
 
 @timing_decorator()
 def file_based_calculation(input_file: str = "input.txt", output_file: str = "output.txt"):
-    """
-    完整的文件操作流程：读取文件、计算、写入结果
     
-    参数:
-    input_file: 输入文件名
-    output_file: 输出文件名
+    print("🔄 Начало процесса работы с файлами")
     
-    返回:
-    float: 计算结果，如果出错返回 None
-    """
-    print("🔄 开始文件操作流程")
-    
-    # 步骤1：读取输入文件
-    with PerformanceMonitor("读取输入文件"):
+    # Шаг 1: Чтение входного файла
+    with PerformanceMonitor("Чтение входного файла"):
         a, b = read_numbers_from_file(input_file)
     
     if a is None or b is None:
-        print("❌ 文件操作流程因读取错误而终止")
+        print("Процесс работы с файлами прерван из-за ошибки чтения")
         return None
     
-    # 步骤2：进行计算
-    with PerformanceMonitor("执行计算"):
+    # Шаг 2: Выполнение вычисления
+    with PerformanceMonitor("Выполнение вычисления"):
         result = calculate_sum(a, b)
     
-    # 步骤3：写入输出文件
-    with PerformanceMonitor("写入输出文件"):
+    # Шаг 3: Запись в выходной файл
+    with PerformanceMonitor("Запись в выходной файл"):
         write_result_to_file(result, output_file)
     
-    print("🎉 文件操作流程完成！")
+    print("Процесс работы с файлами завершен!")
     return result
 
 
 # ============================================================================
-# 演示和测试函数
+# Демонстрационные и тестовые функции
 # ============================================================================
 
 def demonstrate_basic_timing():
-    """演示基本的计时功能"""
-    print("1. 基本计时功能演示")
+    """Демонстрирует базовые функции тайминга"""
+    print("1. Демонстрация базовых функций тайминга")
     print("=" * 50)
     
-    # 测试快速计算
+    # Тест быстрого вычисления
     calculate_sum(5, 3)
     
-    # 测试较慢的计算（模拟）
+    # Тест медленного вычисления (имитация)
     @timing_decorator()
     def slow_calculation():
-        print("正在进行复杂计算...")
-        time.sleep(0.5)  # 模拟计算耗时
+        print("Выполняется сложное вычисление...")
+        time.sleep(0.5)  # Имитация времени вычисления
         result = sum(i ** 2 for i in range(10000))
-        print(f"复杂计算结果: {result}")
+        print(f"Результат сложного вычисления: {result}")
         return result
     
     slow_calculation()
 
 
 def demonstrate_file_operations():
-    """演示文件操作功能"""
-    print("2. 文件操作功能演示")
+    """Демонстрирует функции работы с файлами"""
+    print("2. Демонстрация функций работы с файлами")
     print("=" * 50)
     
-    # 显示当前目录状态
-    print("📁 当前目录文件:")
+    # Показываем состояние текущей директории
+    print("Файлы в текущей директории:")
     for file in os.listdir('.'):
         if file.endswith(('.py', '.txt')):
             size = os.path.getsize(file)
-            print(f"   {file} ({size} 字节)")
+            print(f"   {file} ({size} байт)")
     
     print()
     
-    # 执行文件操作流程
+    # Выполняем процесс работы с файлами
     result = file_based_calculation("input.txt", "output.txt")
     
     if result is not None:
-        print(f"🎯 最终计算结果: {result}")
+        print(f"Итоговый результат вычисления: {result}")
     else:
-        print("💥 文件操作失败")
+        print("Ошибка при работе с файлами")
 
 
 def interactive_demo():
-    """交互式演示"""
-    print("3. 交互式演示")
+    """Интерактивная демонстрация"""
+    print("3. Интерактивная демонстрация")
     print("=" * 50)
     
     while True:
-        print("\n选择要测试的功能:")
-        print("1. 简单数字计算")
-        print("2. 文件操作测试")
-        print("3. 退出")
+        print("\nВыберите функцию для тестирования:")
+        print("1. Простое вычисление с числами")
+        print("2. Тест работы с файлами")
+        print("3. Выход")
         
-        choice = input("请输入选择 (1-3): ").strip()
+        choice = input("Введите выбор (1-3): ").strip()
         
         if choice == '1':
             try:
-                a = float(input("请输入第一个数字: "))
-                b = float(input("请输入第二个数字: "))
+                a = float(input("Введите первое число: "))
+                b = float(input("Введите второе число: "))
                 calculate_sum(a, b)
             except ValueError:
-                print("❌ 请输入有效的数字")
+                print("Пожалуйста, введите действительные числа")
                 
         elif choice == '2':
-            input_file = input("请输入输入文件名 (回车使用 input.txt): ").strip()
-            output_file = input("请输入输出文件名 (回车使用 output.txt): ").strip()
+            input_file = input("Введите имя входного файла (Enter для input.txt): ").strip()
+            output_file = input("Введите имя выходного файла (Enter для output.txt): ").strip()
             
             if not input_file:
                 input_file = "input.txt"
@@ -291,30 +245,30 @@ def interactive_demo():
             file_based_calculation(input_file, output_file)
             
         elif choice == '3':
-            print("👋 退出交互式演示")
+            print("Выход из интерактивной демонстрации")
             break
             
         else:
-            print("❌ 无效选择，请重新输入")
+            print("Неверный выбор, попробуйте снова")
 
 
 def main():
-    """主函数"""
-    print("任务5：函数执行时间测量装饰器")
+    """Главная функция"""
+    print("Задача 5: Декоратор для измерения времени выполнения функций")
     print("=" * 60)
-    print("作者: Ryuukoki")
+    print("Автор: Ryuukoki")
     print("GitHub: liuziqi_github")
     print()
     
-    # 检查必要文件
+    # Проверяем необходимые файлы
     if not os.path.exists("input.txt"):
-        print("⚠️  警告: input.txt 文件不存在")
-        print("正在创建示例 input.txt 文件...")
+        print("Предупреждение: файл input.txt не существует")
+        print("Создание примера файла input.txt...")
         with open("input.txt", 'w') as f:
             f.write("15.5\n23.7\n")
-        print("✅ 已创建 input.txt 文件")
+        print("Файл input.txt создан")
     
-    # 执行演示
+    # Выполняем демонстрацию
     demonstrate_basic_timing()
     print()
     demonstrate_file_operations()
@@ -322,7 +276,7 @@ def main():
     interactive_demo()
     
     print("\n" + "=" * 60)
-    print("任务5完成！感谢使用函数执行时间测量装饰器。")
+    print("Задача 5 завершена! Спасибо за использование декоратора измерения времени выполнения.")
 
 
 if __name__ == "__main__":
