@@ -18,9 +18,7 @@ def filter_strings(filter_lambda, string_array):
 
 
 def demonstrate_filters():
-    """
-    Демонстрирует три различных условия фильтрации
-    """
+    
     # Тестовые данные
     test_strings = [
         "apple",
@@ -95,9 +93,7 @@ def demonstrate_filters():
 
 
 def custom_filter_demo():
-    """
-    Демонстрирует пользовательские условия фильтрации
-    """
+   
     print("5. Демонстрация пользовательской фильтрации")
     print("-" * 40)
     
@@ -117,9 +113,7 @@ def custom_filter_demo():
 
 
 def interactive_filtering():
-    """
-    Интерактивная функция фильтрации
-    """
+    
     print("6. Интерактивная фильтрация строк")
     print("-" * 40)
     print("Введите список строк (разделенных запятыми):")
@@ -169,9 +163,7 @@ def interactive_filtering():
 
 
 def test_edge_cases():
-    """
-    Тестирование граничных случаев
-    """
+    
     print("\n7. Тестирование граничных случаев")
     print("-" * 40)
     
@@ -196,9 +188,7 @@ def test_edge_cases():
 
 
 if __name__ == "__main__":
-    """
-    Главная точка входа программы
-    """
+    
     # Демонстрация базовой функциональности фильтрации
     demonstrate_filters()
     
